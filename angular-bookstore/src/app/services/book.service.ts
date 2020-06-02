@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Book } from '../common/book';
+import { BookCategory } from '../common/bookCategory';
 
 @Injectable({
   providedIn: 'root'
@@ -10,12 +11,20 @@ import { Book } from '../common/book';
 export class BookService {
 
   private baseUrl = 'http://localhost:8081/api/v1/books';
+  private bookCategoryUrl = 'http://localhost:8081/api/v1/book-category'
 
   constructor(private httpClient: HttpClient) { }
 
-  getBooks(): Observable<Book[]> {
-    return this.httpClient.get<GetResponseBooks>(this.baseUrl).pipe(
+  getBooks(theCategoryId: number): Observable<Book[]> {
+    const searchUrl = `${this.baseUrl}/search/categoryid?id=${theCategoryId}`
+    return this.httpClient.get<GetResponseBooks>(searchUrl).pipe(
       map(res => res._embedded.books)
+    )
+  }
+
+  getBookCategory() {
+    return this.httpClient.get<GetResponseBookCategory>(this.bookCategoryUrl).pipe(
+      map(res => res._embedded.bookCategory)
     )
   }
 }
@@ -23,5 +32,11 @@ export class BookService {
 interface GetResponseBooks {
   _embedded: {
     books: Book[]
+  }
+}
+
+interface GetResponseBookCategory {
+  _embedded: {
+    bookCategory: BookCategory[]
   }
 }
